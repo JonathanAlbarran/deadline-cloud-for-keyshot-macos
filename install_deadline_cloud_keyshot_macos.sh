@@ -144,30 +144,73 @@ setup_logging() {
 # Function to detect KeyShot installations
 detect_keyshot() {
     echo -e "${TEXT_COLOR}#${RESET} Calling ${FUNCTION}detect_keyshot${RESET} function..."
-    
-    # Use a for loop instead of mapfile
+
     KEYSHOT_VERSIONS=()
-    while IFS= read -r line; do
-        KEYSHOT_VERSIONS+=("$line")
-    done < <(find "/Library/Application Support" -maxdepth 1 -type d -name "KeyShot*" | grep -Eo 'KeyShot[0-9]+$' | sort -V)
+    KEYSHOT_PATHS=()
+
+    # Function to extract version from plist
+    extract_plist_version() {
+        local plist_file="$1"
+        local version=$(/usr/libexec/PlistBuddy -c "Print :CFBundleShortVersionString" "$plist_file" 2>/dev/null)
+        if [ -z "$version" ]; then
+            version=$(/usr/libexec/PlistBuddy -c "Print :CFBundleVersion" "$plist_file" 2>/dev/null)
+        fi
+        echo "$version"
+    }
+
+    # Search for KeyShot.app and KeyShot<version>.app in /Applications
+    while IFS= read -r app_path; do
+        app_name=$(basename "$app_path")
+        plist_file="$app_path/Contents/Info.plist"
+        if [ -f "$plist_file" ]; then
+            version=$(extract_plist_version "$plist_file")
+            if [ -n "$version" ]; then
+                KEYSHOT_VERSIONS+=("$version")
+                KEYSHOT_PATHS+=("$app_path")
+            fi
+        fi
+    done < <(find "/Applications" -maxdepth 1 -name "KeyShot*.app" -not -name "*Handler.app")
 
     if [ ${#KEYSHOT_VERSIONS[@]} -eq 0 ]; then
         echo -e "${ERROR}#${RESET} No KeyShot installation found. Please ensure KeyShot is installed correctly."
         abort
     elif [ ${#KEYSHOT_VERSIONS[@]} -eq 1 ]; then
-        KEYSHOT_VERSION=${KEYSHOT_VERSIONS[0]}
+        KEYSHOT_VERSION="${KEYSHOT_VERSIONS[0]}"
+        KEYSHOT_PATH="${KEYSHOT_PATHS[0]}"
         echo -e "${SUCCESS}#${RESET} Detected KeyShot version: $KEYSHOT_VERSION"
+        echo -e "${SUCCESS}#${RESET} KeyShot path: $KEYSHOT_PATH"
     else
         echo -e "${WARNING}#${RESET} Multiple KeyShot versions detected. Please choose one:"
-        select KEYSHOT_VERSION in "${KEYSHOT_VERSIONS[@]}"; do
-            if [ -n "$KEYSHOT_VERSION" ]; then
+        for i in "${!KEYSHOT_VERSIONS[@]}"; do
+            echo "$((i+1)). ${KEYSHOT_VERSIONS[i]} (${KEYSHOT_PATHS[i]})"
+        done
+        while true; do
+            echo -e -n "Enter your choice ${STRING}(1-${#KEYSHOT_VERSIONS[@]})${RESET}: "
+            read -r choice
+            if [[ "$choice" =~ ^[0-9]+$ ]] && [ "$choice" -ge 1 ] && [ "$choice" -le "${#KEYSHOT_VERSIONS[@]}" ]; then
+                index=$((choice-1))
+                KEYSHOT_VERSION="${KEYSHOT_VERSIONS[index]}"
+                KEYSHOT_PATH="${KEYSHOT_PATHS[index]}"
                 echo -e "${SUCCESS}#${RESET} Selected KeyShot version: ${VARIABLE}$KEYSHOT_VERSION${RESET}"
+                echo -e "${SUCCESS}#${RESET} KeyShot path: $KEYSHOT_PATH"
                 break
             else
                 echo -e "${ERROR}#${RESET} Invalid selection. Please try again."
             fi
         done
     fi
+
+    # Extract major version number
+    KEYSHOT_MAJOR_VERSION=$(echo "$KEYSHOT_VERSION" | cut -d. -f1)
+    echo -e "${SUCCESS}#${RESET} KeyShot major version: $KEYSHOT_MAJOR_VERSION"
+
+    # Construct the correct folder name
+    if [[ "$KEYSHOT_MAJOR_VERSION" == "13" ]]; then
+        KEYSHOT_FOLDER="KeyShot"
+    else
+        KEYSHOT_FOLDER="KeyShot$KEYSHOT_MAJOR_VERSION"
+    fi
+    echo -e "${SUCCESS}#${RESET} KeyShot folder name: $KEYSHOT_FOLDER"
 }
 
 # Function to check if KeyShot is running
@@ -230,11 +273,24 @@ check_keyshot_running() {
 # Function to download and copy KeyShot Submitter script to the appropriate folder
 copy_keyshot_script() {
     echo -e "${TEXT_COLOR}#${RESET} Calling ${FUNCTION}copy_keyshot_script${RESET} function..."
-    KEYSHOT_SCRIPTS_DIR="/Library/Application Support/$KEYSHOT_VERSION/Scripts/"
-    
-    # Ensure the Scripts directory exists
-    if [ ! -d "$KEYSHOT_SCRIPTS_DIR" ]; then
-        echo -e "${WARNING}#${RESET} Scripts directory not found. Creating it now..."
+    KEYSHOT_SCRIPTS_DIR="/Library/Application Support/$KEYSHOT_FOLDER/Scripts/"
+
+    # Check if the target directory exists and is writable
+    echo -e "${WARNING}#${RESET} Checking target directory..."
+    echo -e "${TEXT_COLOR}#${RESET} Target directory: $KEYSHOT_SCRIPTS_DIR"
+    if [ -d "$KEYSHOT_SCRIPTS_DIR" ]; then
+        echo -e "${SUCCESS}#${RESET} Target directory exists."
+        if [ -w "$KEYSHOT_SCRIPTS_DIR" ]; then
+            echo -e "${SUCCESS}#${RESET} Target directory is writable."
+        else
+            echo -e "${WARNING}#${RESET} Target directory is not writable. Attempting to create with sudo..."
+            if ! sudo mkdir -p "$KEYSHOT_SCRIPTS_DIR"; then
+                echo -e "${ERROR}#${RESET} Failed to create Scripts directory. Please check your permissions."
+                abort
+            fi
+        fi
+    else
+        echo -e "${WARNING}#${RESET} Target directory does not exist. Attempting to create..."
         if ! sudo mkdir -p "$KEYSHOT_SCRIPTS_DIR"; then
             echo -e "${ERROR}#${RESET} Failed to create Scripts directory. Please check your permissions."
             abort
@@ -351,7 +407,7 @@ setup_environment_variables() {
 create_keyshot_env_plist() {
     echo -e "${TEXT_COLOR}#${RESET} Calling ${FUNCTION}create_keyshot_env_plist${RESET} function..."
     local plist_path="$HOME/Library/LaunchAgents/com.keyshot.environment.plist"
-    local keyshot_app="/Applications/$KEYSHOT_VERSION.app"
+    local keyshot_app="/Applications/$KEYSHOT_FOLDER.app"
 
     # Create the plist file
     cat << EOF > "$plist_path"
@@ -408,7 +464,7 @@ install_required_packages() {
 launch_keyshot() {
     echo -e "${TEXT_COLOR}#${RESET} Calling ${FUNCTION}launch_keyshot${RESET} function..."
     echo -e "${WARNING}#${RESET} Preparing to launch KeyShot..."
-    KEYSHOT_APP="/Applications/$KEYSHOT_VERSION.app"
+    KEYSHOT_APP="/Applications/$KEYSHOT_FOLDER.app"
     if [ ! -d "$KEYSHOT_APP" ]; then
         echo -e "${ERROR}#${RESET} Error: KeyShot application not found at ${VARIABLE}$KEYSHOT_APP${RESET}!"
         abort

@@ -145,11 +145,26 @@ setup_logging() {
 detect_keyshot() {
     echo -e "${TEXT_COLOR}#${RESET} Calling ${FUNCTION}detect_keyshot${RESET} function..."
     
-    # Use a for loop instead of mapfile
+    KEYSHOT_BASE_DIR="/Library/Application Support"
     KEYSHOT_VERSIONS=()
-    while IFS= read -r line; do
-        KEYSHOT_VERSIONS+=("$line")
-    done < <(find "/Library/Application Support" -maxdepth 1 -type d -name "KeyShot*" | grep -Eo 'KeyShot[0-9]+$' | sort -V)
+
+    # Find all KeyShot directories, including versioned ones
+    while IFS= read -r dir; do
+        dir_name=$(basename "$dir")
+        if [[ $dir_name == KeyShot[0-9]* ]]; then
+            # Extract version number from directory name
+            version=$(echo "$dir_name" | grep -oE '[0-9.]+')
+            KEYSHOT_VERSIONS+=("$version")
+        elif [[ $dir_name == "KeyShot" ]]; then
+            # Handle the case of the generic "KeyShot" directory
+            if [ -f "$dir/KSSettings.xml" ]; then
+                version=$(grep -oE 'VERSION="[0-9.]+"' "$dir/KSSettings.xml" | cut -d'"' -f2)
+                if [ -n "$version" ]; then
+                    KEYSHOT_VERSIONS+=("$version")
+                fi
+            fi
+        fi
+    done < <(find "$KEYSHOT_BASE_DIR" -maxdepth 1 -type d -name "KeyShot*" | sort -V)
 
     if [ ${#KEYSHOT_VERSIONS[@]} -eq 0 ]; then
         echo -e "${ERROR}#${RESET} No KeyShot installation found. Please ensure KeyShot is installed correctly."

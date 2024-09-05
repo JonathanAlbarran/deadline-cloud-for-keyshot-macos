@@ -10,7 +10,7 @@ printf '\e[8;40;100t'
 ###################################################################################################################################################################################################
 
 # Script                | install_deadline_cloud_keyshot_macos.sh
-# Version               | 1.0
+# Version               | 1.1x
 # Author                | Jonathan Albarran
 # Email                 | dev@jonathanalbarran.com
 # Website               | https://jonathanalbarran.com/
@@ -169,7 +169,7 @@ detect_keyshot() {
                 KEYSHOT_PATHS+=("$app_path")
             fi
         fi
-    done < <(find "/Applications" -maxdepth 1 -name "KeyShot*.app" -not -name "*Handler.app")
+    done < <(find "/Applications" -maxdepth 1 -name "KeyShot*.app" -not -name "*Handler.app" -not -name "*Configurator.app" -not -name "*Monitor.app" -not -name "*Tray.app")
 
     if [ ${#KEYSHOT_VERSIONS[@]} -eq 0 ]; then
         echo -e "${ERROR}#${RESET} No KeyShot installation found. Please ensure KeyShot is installed correctly."

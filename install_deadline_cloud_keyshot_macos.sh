@@ -406,10 +406,21 @@ setup_environment_variables() {
 # Function to create a plist file for KeyShot environment variables
 create_keyshot_env_plist() {
     echo -e "${TEXT_COLOR}#${RESET} Calling ${FUNCTION}create_keyshot_env_plist${RESET} function..."
-    local plist_path="$HOME/Library/LaunchAgents/com.keyshot.environment.plist"
+    local plist_dir="$HOME/Library/LaunchAgents"
+    local plist_path="$plist_dir/com.keyshot.environment.plist"
     local keyshot_app="/Applications/$KEYSHOT_FOLDER.app"
 
+    # Check if the LaunchAgents directory exists, create if it doesn't
+    if [ ! -d "$plist_dir" ]; then
+        echo -e "${WARNING}#${RESET} LaunchAgents directory does not exist. Creating..."
+        if ! mkdir -p "$plist_dir"; then
+            echo -e "${ERROR}#${RESET} Failed to create LaunchAgents directory. Please check your permissions."
+            abort
+        fi
+    fi
+
     # Create the plist file
+    echo -e "${WARNING}#${RESET} Creating plist file..."
     cat << EOF > "$plist_path"
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
@@ -433,6 +444,12 @@ create_keyshot_env_plist() {
 </dict>
 </plist>
 EOF
+
+    # Check if the file was created successfully
+    if [ ! -f "$plist_path" ]; then
+        echo -e "${ERROR}#${RESET} Failed to create plist file. Please check your permissions."
+        abort
+    fi
 
     # Set appropriate permissions for the plist file
     chmod 644 "$plist_path"

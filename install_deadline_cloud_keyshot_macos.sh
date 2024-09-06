@@ -463,7 +463,6 @@ setup_environment_variables() {
         fi
     fi
 
-    create_keyshot_env_plist
 }
 
 # Function to create a plist file for KeyShot environment variables
@@ -624,6 +623,7 @@ main() {
     setup_environment_variables
     copy_keyshot_script
     create_keyshot_launcher
+    create_keyshot_env_plist
     launch_keyshot
 }
 

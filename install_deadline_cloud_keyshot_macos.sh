@@ -491,19 +491,25 @@ create_keyshot_env_plist() {
 <dict>
     <key>Label</key>
     <string>com.keyshot.environment</string>
+    
+    <!-- The program to execute -->
     <key>ProgramArguments</key>
     <array>
-        <string>/bin/sh</string>
+        <string>/bin/bash</string>
         <string>-c</string>
         <string>
         launchctl setenv DEADLINE_PYTHON "$DEADLINE_PYTHON"
         launchctl setenv DEADLINE_KEYSHOT "$DEADLINE_KEYSHOT"
-        launchctl setenv PATH "$VENV_DIR/bin:$PATH"
-        launchctl setenv VIRTUAL_ENV "$VENV_DIR"
+        source "$VENV_DIR/bin/activate" && "$KEYSHOT_APP"/Contents/MacOS/keyshot
         </string>
     </array>
+
+    <!-- Run the agent when a user logs in -->
     <key>RunAtLoad</key>
     <true/>
+
+
+    <!-- Keep the process alive -->
     <key>KeepAlive</key>
     <false/>
 </dict>

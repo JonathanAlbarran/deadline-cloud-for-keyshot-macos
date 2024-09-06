@@ -493,6 +493,8 @@ create_keyshot_env_plist() {
         <string>
         launchctl setenv DEADLINE_PYTHON "$DEADLINE_PYTHON"
         launchctl setenv DEADLINE_KEYSHOT "$DEADLINE_KEYSHOT"
+        launchctl setenv PATH "$VENV_DIR/bin:$PATH"
+        launchctl setenv VIRTUAL_ENV "$VENV_DIR"
         </string>
     </array>
     <key>RunAtLoad</key>

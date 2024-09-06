@@ -549,18 +549,23 @@ create_keyshot_launcher() {
         return 1
     fi
     
-    echo -e "${WARNING}#${RESET} Adding app to Dock..."
-    if ! defaults write com.apple.dock persistent-apps -array-add "<dict><key>tile-data</key><dict><key>file-data</key><dict><key>_CFURLString</key><string>${APP_PATH}</string><key>_CFURLStringType</key><integer>0</integer></dict></dict></dict>"; then
-        echo -e "${ERROR}#${RESET} Failed to add app to Dock. Please check your permissions."
-        return 1
+    # Check if the app is already in the Dock
+    if ! defaults read com.apple.dock persistent-apps | grep -q "${APP_NAME}"; then
+        echo -e "${WARNING}#${RESET} Adding app to Dock..."
+        if ! defaults write com.apple.dock persistent-apps -array-add "<dict><key>tile-data</key><dict><key>file-data</key><dict><key>_CFURLString</key><string>${APP_PATH}</string><key>_CFURLStringType</key><integer>0</integer></dict></dict></dict>"; then
+            echo -e "${ERROR}#${RESET} Failed to add app to Dock. Please check your permissions."
+            return 1
+        fi
+        
+        echo -e "${WARNING}#${RESET} Restarting Dock to apply changes..."
+        if ! killall Dock; then
+            echo -e "${ERROR}#${RESET} Failed to restart Dock. Changes may not be visible until next login."
+        fi
+    else
+        echo -e "${SUCCESS}#${RESET} KeyShot DC Launcher is already in the Dock. Skipping addition."
     fi
     
-    echo -e "${WARNING}#${RESET} Restarting Dock to apply changes..."
-    if ! killall Dock; then
-        echo -e "${ERROR}#${RESET} Failed to restart Dock. Changes may not be visible until next login."
-    fi
-    
-    echo -e "${SUCCESS}#${RESET} KeyShot DC Launcher app has been created and added to the Applications folder and Dock."
+    echo -e "${SUCCESS}#${RESET} KeyShot DC Launcher app has been created and is available in the Applications folder and Dock."
 }
 
 # Function to install required Python packages

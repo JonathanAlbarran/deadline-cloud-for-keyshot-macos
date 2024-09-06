@@ -24,11 +24,16 @@ STARK-DC automates the integration of AWS Deadline Cloud with KeyShot on macOS, 
 ## Installation
 
 **Quick Install (One-Line Command)**
+
 For a quick installation, you can use the following command which downloads and runs the script in one step:
 
-   ```
-   curl -sO https://raw.githubusercontent.com/JonathanAlbarran/deadline-cloud-for-keyshot-macos/main/install_deadline_cloud_keyshot_macos.sh && bash install_deadline_cloud_keyshot_macos.sh
-   ```
+```
+curl -sO https://raw.githubusercontent.com/JonathanAlbarran/deadline-cloud-for-keyshot-macos/main/install_deadline_cloud_keyshot_macos.sh && bash install_deadline_cloud_keyshot_macos.sh
+```
+
+**Manual Install**
+
+If you prefer to download and run the script separately:
 
 1. **Download the installation script:**
    ```

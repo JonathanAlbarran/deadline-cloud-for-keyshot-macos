@@ -1,30 +1,31 @@
 # STARK - Scripted Tool for AWS Rendering Kickoff
-## Deadline Cloud for KeyShot on macOS
+## AWS Deadline Cloud for KeyShot - macOS Setup Script
 
 STARK-DC automates the integration of AWS Deadline Cloud with KeyShot on macOS, streamlining the setup process to allow users to quickly begin leveraging cloud-based rendering capabilities.
 
 ## Features
 
 - Automatic detection of installed KeyShot versions
+- Installation of Xcode Command Line Tools if not present
 - Creation and activation of a Python virtual environment
 - Installation of required Python packages: `deadline-cloud-for-keyshot` and `deadline[gui]`
 - Download and placement of AWS Deadline Cloud submission script in the appropriate KeyShot Scripts folder
 - Setup of necessary environment variables for AWS Deadline Cloud integration
 - Creation of a LaunchAgent for persistent environment variable setup
-- Option to launch KeyShot immediately after setup
+- Creation of a KeyShot DC Launcher app and addition to the Dock
 - Logging capability for troubleshooting
 
 ## Prerequisites
 
 - macOS operating system
 - KeyShot installed
-- Python 3 installed
+- Internet connection
 
 ## Installation
 
 1. **Download the installation script:**
    ```
-   curl -O https://raw.githubusercontent.com/JonathanAlbarran/deadline-cloud-for-keyshot-macos/main/install_deadline_cloud_keyshot_macos.sh
+   curl -sO https://raw.githubusercontent.com/JonathanAlbarran/deadline-cloud-for-keyshot-macos/main/install_deadline_cloud_keyshot_macos.sh
    ```
 
 2. **Run the installation script:**
@@ -46,10 +47,16 @@ The log file will be created at `~/Documents/setup_deadline_keyshot.log`.
 
 - The script will detect installed KeyShot versions and prompt you to choose one if multiple versions are found.
 - If KeyShot is running, the script will provide options to save your work and close KeyShot, force close KeyShot, or exit the script.
-- The script will download and install the necessary Python packages in a virtual environment.
-- It will set up required environment variables and create a launch agent to ensure these variables are set for KeyShot.
+- The script will check for and install Xcode Command Line Tools if necessary.
+- It will create a Python virtual environment and install the required packages.
+- The script will set up required environment variables and create a launch agent to ensure these variables are set for KeyShot.
 - The AWS Deadline Cloud submission script will be downloaded and placed in the appropriate KeyShot Scripts folder.
-- At the end of the installation, you'll have the option to launch KeyShot immediately.
+- A KeyShot DC Launcher app will be created and added to the Dock for easy access.
+- At the end of the installation, you'll receive instructions on how to launch KeyShot with the correct environment settings.
+
+## Usage
+
+After installation, always use the "KeyShot DC Launcher" from your Applications folder or Dock to start KeyShot. This ensures that KeyShot runs with the necessary environment variables for AWS Deadline Cloud integration.
 
 ## Troubleshooting
 

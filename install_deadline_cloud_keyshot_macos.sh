@@ -544,6 +544,7 @@ main() {
     setup_logging "$enable_logging"
     start_script
     detect_keyshot
+    install_xcode_cli_tools
 
     if [[ "$skip_keyshot_check" != "skip_check" ]]; then
         check_keyshot_running

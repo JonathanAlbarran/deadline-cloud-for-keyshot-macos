@@ -500,7 +500,7 @@ create_keyshot_env_plist() {
         <string>
         launchctl setenv DEADLINE_PYTHON "$DEADLINE_PYTHON"
         launchctl setenv DEADLINE_KEYSHOT "$DEADLINE_KEYSHOT"
-        source "$VENV_DIR/bin/activate" && "$KEYSHOT_APP"/Contents/MacOS/keyshot
+        source $VENV_DIR/bin/activate && /Applications/$KEYSHOT_FOLDER.app/Contents/MacOS/keyshot
         </string>
     </array>
 

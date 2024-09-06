@@ -436,12 +436,16 @@ setup_environment_variables() {
     echo -e "${TEXT_COLOR}#${RESET} Calling ${FUNCTION}setup_environment_variables${RESET} function..."
     DEADLINE_PYTHON="$VENV_DIR/bin/python3"
     echo "export DEADLINE_PYTHON=\"$DEADLINE_PYTHON\"" >> ~/.zshrc
+    echo "export DEADLINE_PYTHON=\"$DEADLINE_PYTHON\"" >> ~/.bash_profile
 
     PYTHON_SITE_PACKAGES=$("$DEADLINE_PYTHON" -c "import site; print(site.getsitepackages()[0])")
     DEADLINE_KEYSHOT="$PYTHON_SITE_PACKAGES/deadline/keyshot_submitter"
     echo "export DEADLINE_KEYSHOT=\"$DEADLINE_KEYSHOT\"" >> ~/.zshrc
+    echo "export DEADLINE_KEYSHOT=\"$DEADLINE_KEYSHOT\"" >> ~/.bash_profile
 
+    # Source the updated files
     source ~/.zshrc
+    source ~/.bash_profile
 
     echo -e "${KEYWORD}#${RESET} DEADLINE_PYTHON is set to: ${VARIABLE}$DEADLINE_PYTHON${RESET}"
     echo -e "${KEYWORD}#${RESET} DEADLINE_KEYSHOT is set to: ${VARIABLE}$DEADLINE_KEYSHOT${RESET}"
@@ -453,6 +457,7 @@ setup_environment_variables() {
         if [ -d "$DEADLINE_KEYSHOT" ]; then
             echo -e "${SUCCESS}#${RESET} DEADLINE_KEYSHOT found at: ${VARIABLE}$DEADLINE_KEYSHOT${RESET}"
             echo "export DEADLINE_KEYSHOT=\"$DEADLINE_KEYSHOT\"" >> ~/.zshrc
+            echo "export DEADLINE_KEYSHOT=\"$DEADLINE_KEYSHOT\"" >> ~/.bash_profile
         else
             echo -e "${ERROR}#${RESET} Unable to locate DEADLINE_KEYSHOT. Please check your installation."
         fi

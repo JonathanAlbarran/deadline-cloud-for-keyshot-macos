@@ -10,7 +10,7 @@ printf '\e[8;40;100t'
 ###################################################################################################################################################################################################
 
 # Script                | install_deadline_cloud_keyshot_macos.sh
-# Version               | 1.1x
+# Version               | 2.0
 # Author                | Jonathan Albarran
 # Email                 | dev@jonathanalbarran.com
 # Website               | https://jonathanalbarran.com/
@@ -572,7 +572,7 @@ create_keyshot_launcher() {
 install_required_packages() {
     echo -e "${TEXT_COLOR}#${RESET} Calling ${FUNCTION}install_required_packages${RESET} function..."
     echo -e "${WARNING}#${RESET} Installing deadline-cloud-for-keyshot, deadline[gui] packages..."
-    if ! "$VENV_DIR/bin/pip" install deadline-cloud-for-keyshot==0.1.3 'deadline[gui]'; then
+    if ! "$VENV_DIR/bin/pip" install deadline-cloud-for-keyshot==0.2.1 'deadline[gui]'; then
         echo -e "${ERROR}#${RESET} Error: Package installation failed!"
         abort
     fi
@@ -584,7 +584,7 @@ provide_launch_instructions() {
     echo -e "${TEXT_COLOR}#${RESET} Calling ${FUNCTION}provide_launch_instructions${RESET} function..."
     
     echo -e "\n${BOLD}${SUCCESS}#########################################################################${RESET}"
-    echo -e "${BOLD}${SUCCESS}#${RESET}                   KeyShot Launch Instructions                    ${BOLD}${SUCCESS}#${RESET}"
+    echo -e "${BOLD}${SUCCESS}#${RESET}                     KeyShot Launch Instructions                     ${BOLD}${SUCCESS}#${RESET}"
     echo -e "${BOLD}${SUCCESS}#########################################################################${RESET}\n"
 
     echo -e "${TEXT_COLOR}#${RESET} To use KeyShot with AWS Deadline Cloud, you must launch it using the new launcher:"

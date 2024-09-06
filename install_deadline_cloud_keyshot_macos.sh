@@ -331,6 +331,39 @@ copy_keyshot_script() {
     fi
 }
 
+# Function to install and verify Xcode Command Line Tools
+install_xcode_cli_tools() {
+    echo -e "${TEXT_COLOR}#${RESET} Calling ${FUNCTION}install_xcode_cli_tools${RESET} function..."
+    
+    if ! xcode-select -p &> /dev/null; then
+        echo -e "${WARNING}#${RESET} Xcode Command Line Tools not found."
+        echo -e "${TEXT_COLOR}#${RESET} Would you like to install Xcode Command Line Tools now?"
+        echo -e -n "Enter ${STRING}(y/n)${RESET}: "
+        read -r install_choice
+        
+        if [[ $install_choice =~ ^[Yy]$ ]]; then
+            echo -e "${WARNING}#${RESET} Initiating Xcode Command Line Tools installation..."
+            xcode-select --install
+            echo -e "${TEXT_COLOR}#${RESET} Please complete the installation process when prompted."
+            echo -e "${TEXT_COLOR}#${RESET} Press any key once the installation is complete..."
+            read -n 1 -s
+            
+            if ! xcode-select -p &> /dev/null; then
+                echo -e "${ERROR}#${RESET} Xcode Command Line Tools installation failed or was cancelled."
+                echo -e "${TEXT_COLOR}#${RESET} Unable to proceed without Xcode Command Line Tools."
+                abort
+            else
+                echo -e "${SUCCESS}#${RESET} Xcode Command Line Tools installed successfully."
+            fi
+        else
+            echo -e "${ERROR}#${RESET} Xcode Command Line Tools are required to proceed."
+            abort
+        fi
+    else
+        echo -e "${SUCCESS}#${RESET} Xcode Command Line Tools are already installed."
+    fi
+}
+
 # Function to create and activate virtual environment
 create_and_activate_venv() {
     echo -e "${TEXT_COLOR}#${RESET} Calling ${FUNCTION}create_and_activate_venv${RESET} function..."
@@ -511,6 +544,7 @@ main() {
     setup_logging "$enable_logging"
     start_script
     detect_keyshot
+    install_xcode_cli_tools
 
     if [[ "$skip_keyshot_check" != "skip_check" ]]; then
         check_keyshot_running

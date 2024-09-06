@@ -537,6 +537,33 @@ EOF
     fi
 }
 
+# Function to create KeyShot DC Launcher app and add it to Dock
+create_keyshot_launcher() {
+    echo -e "${TEXT_COLOR}#${RESET} Calling ${FUNCTION}create_keyshot_launcher${RESET} function..."
+    
+    local APP_NAME="KeyShot DC Launcher"
+    local APP_PATH="/Applications/${APP_NAME}.app"
+    
+    echo -e "${WARNING}#${RESET} Creating Automator app..."
+    if ! osacompile -o "${APP_PATH}" -e 'do shell script "launchctl start com.keyshot.environment"'; then
+        echo -e "${ERROR}#${RESET} Failed to create Automator app. Please check your permissions."
+        return 1
+    fi
+    
+    echo -e "${WARNING}#${RESET} Adding app to Dock..."
+    if ! defaults write com.apple.dock persistent-apps -array-add "<dict><key>tile-data</key><dict><key>file-data</key><dict><key>_CFURLString</key><string>${APP_PATH}</string><key>_CFURLStringType</key><integer>0</integer></dict></dict></dict>"; then
+        echo -e "${ERROR}#${RESET} Failed to add app to Dock. Please check your permissions."
+        return 1
+    fi
+    
+    echo -e "${WARNING}#${RESET} Restarting Dock to apply changes..."
+    if ! killall Dock; then
+        echo -e "${ERROR}#${RESET} Failed to restart Dock. Changes may not be visible until next login."
+    fi
+    
+    echo -e "${SUCCESS}#${RESET} KeyShot DC Launcher app has been created and added to the Applications folder and Dock."
+}
+
 # Function to install required Python packages
 install_required_packages() {
     echo -e "${TEXT_COLOR}#${RESET} Calling ${FUNCTION}install_required_packages${RESET} function..."
@@ -596,6 +623,7 @@ main() {
     install_required_packages
     setup_environment_variables
     copy_keyshot_script
+    create_keyshot_launcher
     launch_keyshot
 }
 

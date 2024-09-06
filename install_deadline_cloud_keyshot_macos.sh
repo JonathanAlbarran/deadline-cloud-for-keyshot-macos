@@ -335,33 +335,58 @@ copy_keyshot_script() {
 install_xcode_cli_tools() {
     echo -e "${TEXT_COLOR}#${RESET} Calling ${FUNCTION}install_xcode_cli_tools${RESET} function..."
     
-    if ! xcode-select -p &> /dev/null; then
-        echo -e "${WARNING}#${RESET} Xcode Command Line Tools not found."
-        echo -e "${TEXT_COLOR}#${RESET} Would you like to install Xcode Command Line Tools now?"
-        echo -e -n "Enter ${STRING}(y/n)${RESET}: "
-        read -r install_choice
-        
-        if [[ $install_choice =~ ^[Yy]$ ]]; then
-            echo -e "${WARNING}#${RESET} Initiating Xcode Command Line Tools installation..."
-            xcode-select --install
-            echo -e "${TEXT_COLOR}#${RESET} Please complete the installation process when prompted."
-            echo -e "${TEXT_COLOR}#${RESET} Press any key once the installation is complete..."
-            read -n 1 -s
+    while true; do
+        if ! xcode-select -p &> /dev/null; then
+            echo -e "${WARNING}#${RESET} Xcode Command Line Tools not found."
+            echo -e "${TEXT_COLOR}#${RESET} Would you like to install Xcode Command Line Tools now?"
+            echo -e -n "Enter ${STRING}(y/n)${RESET}: "
+            read -r install_choice
             
-            if ! xcode-select -p &> /dev/null; then
-                echo -e "${ERROR}#${RESET} Xcode Command Line Tools installation failed or was cancelled."
-                echo -e "${TEXT_COLOR}#${RESET} Unable to proceed without Xcode Command Line Tools."
-                abort
+            if [[ $install_choice =~ ^[Yy]$ ]]; then
+                echo -e "${WARNING}#${RESET} Initiating Xcode Command Line Tools installation..."
+                xcode-select --install
+                echo -e "${TEXT_COLOR}#${RESET} Please complete the installation process when prompted."
+                echo -e "${TEXT_COLOR}#${RESET} Type ${STRING}'done'${RESET} and press Enter once the installation is complete,"
+                echo -e "${TEXT_COLOR}#${RESET} or type ${STRING}'retry'${RESET} to start over if you encountered any issues."
+                echo -e -n "Enter ${STRING}(done/retry)${RESET}: "
+                
+                while true; do
+                    read -r completion_status
+                    if [[ $completion_status == "done" ]]; then
+                        break
+                    elif [[ $completion_status == "retry" ]]; then
+                        echo -e "${WARNING}#${RESET} Restarting Xcode Command Line Tools installation..."
+                        break
+                    else
+                        echo -e "${ERROR}#${RESET} Invalid input. Please type ${STRING}'done'${RESET} or ${STRING}'retry'${RESET}."
+                        echo -e -n "Enter ${STRING}(done/retry)${RESET}: "
+                    fi
+                done
+                
+                if [[ $completion_status == "done" ]]; then
+                    if xcode-select -p &> /dev/null; then
+                        echo -e "${SUCCESS}#${RESET} Xcode Command Line Tools installed successfully."
+                        return 0
+                    else
+                        echo -e "${ERROR}#${RESET} Xcode Command Line Tools installation could not be verified."
+                        echo -e "${TEXT_COLOR}#${RESET} Would you like to try again?"
+                        echo -e -n "Enter ${STRING}(y/n)${RESET}: "
+                        read -r retry_choice
+                        if [[ ! $retry_choice =~ ^[Yy]$ ]]; then
+                            echo -e "${ERROR}#${RESET} Unable to proceed without Xcode Command Line Tools."
+                            abort
+                        fi
+                    fi
+                fi
             else
-                echo -e "${SUCCESS}#${RESET} Xcode Command Line Tools installed successfully."
+                echo -e "${ERROR}#${RESET} Xcode Command Line Tools are required to proceed."
+                abort
             fi
         else
-            echo -e "${ERROR}#${RESET} Xcode Command Line Tools are required to proceed."
-            abort
+            echo -e "${SUCCESS}#${RESET} Xcode Command Line Tools are already installed."
+            return 0
         fi
-    else
-        echo -e "${SUCCESS}#${RESET} Xcode Command Line Tools are already installed."
-    fi
+    done
 }
 
 # Function to create and activate virtual environment

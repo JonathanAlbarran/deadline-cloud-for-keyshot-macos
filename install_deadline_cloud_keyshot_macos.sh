@@ -574,30 +574,26 @@ install_required_packages() {
     echo -e "${SUCCESS}#${RESET} Packages installed successfully."
 }
 
-# Function to launch KeyShot
-launch_keyshot() {
-    echo -e "${TEXT_COLOR}#${RESET} Calling ${FUNCTION}launch_keyshot${RESET} function..."
-    echo -e "${WARNING}#${RESET} Preparing to launch KeyShot..."
-    KEYSHOT_APP="/Applications/$KEYSHOT_FOLDER.app"
-    if [ ! -d "$KEYSHOT_APP" ]; then
-        echo -e "${ERROR}#${RESET} Error: KeyShot application not found at ${VARIABLE}$KEYSHOT_APP${RESET}!"
-        abort
-    fi
-    echo -e "${KEYWORD}#${RESET} KeyShot application found at: ${VARIABLE}$KEYSHOT_APP${RESET}"
-
-    # Prompt user to launch KeyShot
-    echo -e "${TEXT_COLOR}#${RESET} Would you like to launch KeyShot now?"
-    echo -e -n "Enter ${STRING}(y/n)${RESET}: "
-    read -r launch_choice
-    if [[ $launch_choice =~ ^[Yy]$ ]]; then
-        echo -e "${WARNING}#${RESET} Launching KeyShot..."
-        open "$KEYSHOT_APP"
-        echo -e "${SUCCESS}#${RESET} KeyShot has been launched."
-    else
-        echo -e "${TEXT_COLOR}#${RESET} KeyShot launch skipped."
-    fi
+# Function to provide KeyShot launch instructions
+provide_launch_instructions() {
+    echo -e "${TEXT_COLOR}#${RESET} Calling ${FUNCTION}provide_launch_instructions${RESET} function..."
     
-    echo -e "${SUCCESS}#${RESET} Installation complete. Please restart KeyShot to use the AWS Deadline Cloud submission script."
+    echo -e "\n${BOLD}${SUCCESS}#########################################################################${RESET}"
+    echo -e "${BOLD}${SUCCESS}#${RESET}                   KeyShot Launch Instructions                    ${BOLD}${SUCCESS}#${RESET}"
+    echo -e "${BOLD}${SUCCESS}#########################################################################${RESET}\n"
+
+    echo -e "${TEXT_COLOR}#${RESET} To use KeyShot with AWS Deadline Cloud, you must launch it using the new launcher:"
+    echo -e "${KEYWORD}#${RESET} 1. Look for ${VARIABLE}'KeyShot DC Launcher'${RESET} in your Applications folder or Dock."
+    echo -e "${KEYWORD}#${RESET} 2. Click on ${VARIABLE}'KeyShot DC Launcher'${RESET} to start KeyShot with the correct environment."
+    echo -e "${WARNING}#${RESET} Do NOT launch KeyShot directly from its normal icon."
+    
+    echo -e "\n${TEXT_COLOR}#${RESET} The launcher ensures that KeyShot runs with the necessary environment variables"
+    echo -e "${TEXT_COLOR}#${RESET} for AWS Deadline Cloud integration."
+    
+    echo -e "\n${SUCCESS}#${RESET} Installation is complete. You can now use KeyShot with AWS Deadline Cloud."
+    echo -e "${SUCCESS}#${RESET} Remember to always use the ${VARIABLE}'KeyShot DC Launcher'${RESET} to start KeyShot."
+    
+    echo -e "\n${BOLD}${SUCCESS}#########################################################################${RESET}\n"
 }
 
 # Main execution function
@@ -624,7 +620,7 @@ main() {
     copy_keyshot_script
     create_keyshot_launcher
     create_keyshot_env_plist
-    launch_keyshot
+    provide_launch_instructions
 }
 
 # Call the main function to start the script

@@ -315,7 +315,7 @@ copy_keyshot_script() {
     echo -e "${TEXT_COLOR}#${RESET} Downloading KeyShot Submitter script..."
     
     # Download and copy the script
-    if curl -sSL "https://raw.githubusercontent.com/aws-deadline/deadline-cloud-for-keyshot/release/keyshot_script/Submit%20to%20AWS%20Deadline%20Cloud.py" -o "$TARGET_FILE"; then
+    if curl -sSL "https://raw.githubusercontent.com/aws-deadline/deadline-cloud-for-keyshot/release/src/deadline/keyshot_submitter/Submit%20to%20AWS%20Deadline%20Cloud.py" -o "$TARGET_FILE"; then
         echo -e "${SUCCESS}#${RESET} KeyShot Submitter script downloaded and copied successfully to ${VARIABLE}$KEYSHOT_SCRIPTS_DIR${RESET}"
         # Set appropriate permissions
         sudo chmod 644 "$TARGET_FILE"
